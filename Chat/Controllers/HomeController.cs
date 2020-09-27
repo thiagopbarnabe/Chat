@@ -20,6 +20,11 @@ namespace Chat.Controllers
 
         public IActionResult Index()
         {
+            ViewBag.listaDeMensagens = new List<string>{
+                "mensagem1",
+                "mensagem2",
+                "mensagem3"
+            };
             return View();
         }
 
@@ -30,7 +35,7 @@ namespace Chat.Controllers
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
-        {
+        {            
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
