@@ -14,4 +14,4 @@ This is the default configuration:
 
 Keep in mind that you need to use a queuename not previously utilized otherwise if queue has different settings than Chat it won't work.
 
-![alt text](https://github.com/thiagopbarnabe/Chat/edit/master/image.jpg?raw=true)
+![alt text](https://github.com/thiagopbarnabe/Chat/edit/master/image1.png?raw=true)
