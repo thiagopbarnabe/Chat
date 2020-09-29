@@ -4,13 +4,21 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
 //Disable send button until connection is established
 document.getElementById("sendButton").disabled = true;
+var messagesList = document.getElementById("messagesList");    
+messagesList.scrollTop = messagesList.scrollHeight
+
 
 connection.on("ReceiveMessage", function (user, message) {
     var msg = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    var encodedMsg = user + " says " + msg;
+    var encodedMsg = user + " says: " + msg;
+    var bold = document.createElement("b");
+    bold.textContent = user;
+    var span = document.createElement("span");
+    span.textContent = " says: " + msg;
     var li = document.createElement("li");
-    li.textContent = encodedMsg;
-    var messagesList = document.getElementById("messagesList");    
+    li.appendChild(bold);
+    li.appendChild(span);
+    
     var extraMessages = messagesList.children.length - 49
     if (extraMessages > 0) {
         for (var i = 0; i < extraMessages; i++) {
@@ -18,6 +26,7 @@ connection.on("ReceiveMessage", function (user, message) {
         }
     }
     messagesList.appendChild(li);
+    messagesList.scrollTop = messagesList.scrollHeight
 });
 
 connection.start().then(function () {
@@ -26,10 +35,19 @@ connection.start().then(function () {
     return console.error(err.toString());
 });
 
-document.getElementById("sendButton").addEventListener("click", function (event) {
-    var user = document.getElementById("userInput").value;
-    var message = document.getElementById("messageInput").value;
-    connection.invoke("SendMessage", user, message).catch(function (err) {
+document.getElementById("messageInput").addEventListener("keyup", function (event) {
+    event.preventDefault();
+    if (event.keyCode === 13) {
+        document.getElementById("sendButton").click();
+    }
+});
+
+document.getElementById("sendButton").addEventListener("click", function (event) {    
+    var messageInput = document.getElementById("messageInput");
+    connection.invoke("SendMessage", messageInput.value).then(function () {
+        messageInput.value = "";
+        console.log("aqui");
+    }).catch(function (err) {
         return console.error(err.toString());
     });
     event.preventDefault();

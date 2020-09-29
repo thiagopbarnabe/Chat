@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using RabbitMQ.Client;
 
 namespace Chat.Data
 {
@@ -10,7 +11,8 @@ namespace Chat.Data
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
-        {
+        {        
         }
+        public DbSet<Message> Messages { get; set; }
     }
 }

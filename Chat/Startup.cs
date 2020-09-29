@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Chat.Hubs;
+using Chat.Services;
 
 namespace Chat
 {
@@ -36,10 +37,14 @@ namespace Chat
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddSignalR();
+            services.AddSwaggerGen();
+            services.AddSingleton<IRabbitMqConsumerService, RabbitMqConsumerService>(); // Need a single instance so we can keep the referenced connect with RabbitMQ open
+            services.AddSingleton<IRabbitMqProducerService, RabbitMqProducerService>(); // Need a single instance so we can keep the referenced connect with RabbitMQ open
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime lft)
         {
             if (env.IsDevelopment())
             {
@@ -56,6 +61,11 @@ namespace Chat
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+
+            });
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -67,6 +77,12 @@ namespace Chat
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
                 endpoints.MapHub<ChatHub>("/chathub");
+            });
+
+            //connect RabbitMQ
+            lft.ApplicationStarted.Register(()=> {
+                var rabbitMQService = (IRabbitMqConsumerService)app.ApplicationServices.GetService(typeof(IRabbitMqConsumerService));
+                rabbitMQService.Connect();
             });
         }
     }
